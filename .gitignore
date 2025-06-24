@@ -1,4 +1,10 @@
-audio/
-videos/
-saved_photos/
+saved_photos/*
+!saved_photos/.gitkeep
+
+videos/*
+!videos/.gitkeep
+
+audio/*
+!audio/.gitkeep
+
 .venv/
