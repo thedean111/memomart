@@ -3,6 +3,7 @@ from picamera2 import Picamera2
 
 from gpiozero import Button, PWMLED
 from evdev import InputDevice, ecodes
+import evdev
 from PIL import Image
 
 import time
@@ -22,7 +23,14 @@ button = None
 # -------------------------------------------------------------------
 def Setup():
     global ir, button, lastIR
-    ir = InputDevice('/dev/input/event4')
+
+    devices = [InputDevice(path) for path in evdev.list_devices()]
+    ir_path = ""
+    for device in devices:
+        if "gpio_ir_recv" in device.name.lower():
+            ir_path = device.path
+
+    ir = InputDevice(ir_path)
     button = Button(17, pull_up=True, bounce_time=0.2)
     LED.Init()
     lastIR = time.time()
@@ -39,7 +47,6 @@ def ServiceLoop():
     button_ready = True
     last_press = 0
     lastIR = 0
-    lastIR_code = -1
 
     # Show user that the device can now be used
     printer.PrintActivationMessage()
@@ -48,14 +55,17 @@ def ServiceLoop():
     while True:
         # When reading an event from the infrared receiver
         event = ir.read_one()
-        if ((time.time() - lastIR) >= settings.IR_REBOUNCE_DELAY) and event and event.type == ecodes.EV_MSC and event.code == ecodes.MSC_SCAN and (event.value != lastIR_code):
+        if ((time.time() - lastIR) >= settings.IR_REBOUNCE_DELAY) and event and event.type == ecodes.EV_MSC and event.code == ecodes.MSC_SCAN:
             lastIR = time.time()
-            lastIR_code = event.value
             val = IR.handleIR(event.value)
             if val is not None:
                 print(val)
                 printer.PrintSettingsChange()
                 LED.Blink(val)
+            
+            # Flush all events that may be pending
+            while ir.read_one():
+                pass  # Discard the event
 
         # When the button is pressed
         if button.is_pressed and button_ready:
@@ -80,7 +90,9 @@ def ServiceLoop():
 
             # Paste the photo on the frame
             picture = CAM.ConfigureMemomartFormat(savepath)
-
+            
+            img = Image.open(savepath).rotate(settings.ROTATION, expand=True).resize((settings.PICTURE_SIZE_X, settings.PICTURE_SIZE_Y))
+            
             # Print the result
             printer.PrintPhoto(picture)
 

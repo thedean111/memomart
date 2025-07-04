@@ -8,16 +8,16 @@ Dean Badr
 The follow lines are useful terminal commands that help control and inspect the service:
 
 _Restart the currently running service_
-* `sudo systemctl restart memomart.service`
-
+`sudo systemctl restart memomart.service`
+<br>
 _Stop the currently running service_
-* `sudo systemctl stop memomart.service`
-
+`sudo systemctl stop memomart.service`
+<br>
 _Start the service if it is not already running_
-* `sudo systemctl start memomart.service`
-
+`sudo systemctl start memomart.service`
+<br>
 _View a live feed of logging from the service_
-* `journalctl -u memomart.service -f`
-
+`journalctl -u memomart.service -f`
+<br>
 _Observe the throttled status of the raspberry pi_
-* `vcgencmd get_throttled`
+`vcgencmd get_throttled`

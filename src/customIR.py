@@ -5,18 +5,20 @@ import customCamera as CAM
 # -------------------------------------------------------------------
 # IR REMOTE CODES
 # -------------------------------------------------------------------
-NUM_0 = 0x16 # (22) #
-NUM_1 = 0x0c # (12) #
-NUM_2 = 0x18 # (24) # 
-NUM_3 = 0x5e # (94) #
+NUM_0 = 0x16 # (22) # Instant
+NUM_1 = 0x0c # (12) # No prompt, slight delay
+NUM_2 = 0x18 # (24) # Print prompt, no time
+NUM_3 = 0x5e # (94) # Print prompt, with time
 NUM_4 = 0x08 # (08)
 NUM_5 = 0x1c # (28)
 NUM_6 = 0x5a # (90)
 NUM_7 = 0x42 # (66)
-NUM_8 = 0x52 # (82) #
-NUM_9 = 0x4a # (74) #
-DOWN_ARROW = 0x07 # no save mode #
-UP_ARROW = 0x09 # save mode #
+NUM_8 = 0x52 # (82) # Record
+NUM_9 = 0x4a # (74) # Stop Recording
+DOWN_ARROW = 0x07   # no save mode #
+UP_ARROW = 0x09     # save mode #
+REWIND = 0x44       # Decrease low-light
+FORWARD = 0x43      # Increase low-light
 
 
 # -------------------------------------------------------------------
@@ -69,13 +71,13 @@ def handleIR(value):
         return 10
     
     # Day mode
-    elif value == NUM_4:
-        settings.BRIGHTNESS_FACTOR = 1
-        return 5
+    elif value == REWIND:
+        CAM.SetCameraParams(-1)
+        return 1
     
     # Night mode
-    elif value == NUM_5:
-        settings.BRIGHTNESS_FACTOR = 1.75
-        return 6
+    elif value == FORWARD:
+        CAM.SetCameraParams(1)
+        return 1
     
     return None

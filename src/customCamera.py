@@ -1,13 +1,12 @@
 import cv2
 from picamera2 import Picamera2
-from PIL import Image, ImageEnhance
+from PIL import Image
 import os
 import threading
 import queue
 import time
 import pyaudio
 import wave
-import subprocess
 import settings
 
 camera = None
@@ -15,12 +14,16 @@ video = None
 audio = None
 cam_lock = None
 
+gain_incr = 0
+brightness_incr = 0
+exposure_incr = 0
+
 # -------------------------------------------------------------------
 # SetupCamera: Based on user definition, attempt to connect to a 
 # camera plugged into the raspberry pi
 # -------------------------------------------------------------------
 def SetupCamera():
-    global camera, video, cam_lock
+    global camera, video, cam_lock, gain_incr, brightness_incr, exposure_incr
 
     try:
         if settings.USE_WEBCAM:
@@ -29,6 +32,11 @@ def SetupCamera():
             if not camera.isOpened():
                 print("Could not open webcam.")
                 exit()
+
+            camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
+            camera.set(cv2.CAP_PROP_GAIN, settings.MIN_GAIN)
+            camera.set(cv2.CAP_PROP_BRIGHTNESS, settings.MIN_BRIGHTNESS)
+            camera.set(cv2.CAP_PROP_EXPOSURE, settings.MIN_EXPOSURE)
 
         elif settings.USE_PICAM:
             settings.ROTATION = -90
@@ -50,6 +58,41 @@ def SetupCamera():
     except Exception as e:
         print("Failed to open the camera:", e)
         exit()
+
+    gain_incr = (settings.MAX_GAIN - settings.MIN_GAIN) / settings.CAM_MODE_INCREMENTS
+    brightness_incr = (settings.MAX_BRIGHTNESS - settings.MIN_BRIGHTNESS) / settings.CAM_MODE_INCREMENTS
+    exposure_incr = (settings.MAX_EXPOSURE - settings.MIN_EXPOSURE) / settings.CAM_MODE_INCREMENTS
+
+# -------------------------------------------------------------------
+# SetCameraParams: Using openCV, set any camera params
+# -------------------------------------------------------------------
+def SetCameraParams(value):
+    value = value >= 0 if 1 else -1
+
+    newGain = camera.get(cv2.CAP_PROP_GAIN) + (value * gain_incr)
+    if (newGain < settings.MIN_GAIN):
+        newGain = settings.MIN_GAIN
+    elif (newGain > settings.MAX_GAIN):
+        newGain = settings.MAX_GAIN
+
+    newBri = camera.get(cv2.CAP_PROP_BRIGHTNESS) + (value * brightness_incr)
+    if (newBri < settings.MIN_BRIGHTNESS):
+        newBri = settings.MIN_BRIGHTNESS
+    elif (newBri > settings.MAX_BRIGHTNESS):
+        newBri = settings.MAX_BRIGHTNESS
+
+    newExpo = camera.get(cv2.CAP_PROP_EXPOSURE) + (value * exposure_incr)
+    if (newExpo < settings.MIN_EXPOSURE):
+        newExpo = settings.MIN_EXPOSURE
+    elif (newExpo > settings.MAX_EXPOSURE):
+        newExpo = settings.MAX_EXPOSURE
+
+    print(f"Setting camera params...\nGAIN = {newGain}\nBRIGHTNESS = {newBri}\nEXPOSURE = {newExpo}\n")
+
+    camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
+    camera.set(cv2.CAP_PROP_GAIN, newGain)
+    camera.set(cv2.CAP_PROP_BRIGHTNESS, newBri)
+    camera.set(cv2.CAP_PROP_EXPOSURE, newExpo)
 
 # -------------------------------------------------------------------
 # RecordFrame: Saves the current frame to the video that is recording
@@ -182,13 +225,6 @@ def ConfigureMemomartFormat(filepath):
     try:
         # Open the image saved by the webcam and do necessary adjustments
         img = Image.open(filepath).rotate(settings.ROTATION, expand=True).resize((settings.PICTURE_SIZE_X, settings.PICTURE_SIZE_Y))
-        
-        # Create a Brightness enhancer object
-        enhancer = ImageEnhance.Brightness(img)
-
-        # Enhance the brightness (e.g., by 50%)
-        # A factor of 1.5 increases brightness by 50%
-        enhanced_image = enhancer.enhance(settings.BRIGHTNESS_FACTOR)
 
         # Open the frame
         abspath = os.path.abspath(".")
@@ -196,7 +232,7 @@ def ConfigureMemomartFormat(filepath):
         memomartFrame = Image.open(dir_path)
 
         # Combine the two images
-        memomartFrame.paste(enhanced_image, (settings.PICTURE_OFFSET_X, settings.PICTURE_OFFSET_Y))
+        memomartFrame.paste(img, (settings.PICTURE_OFFSET_X, settings.PICTURE_OFFSET_Y))
         memomartFrame.convert('L').save("memomart_photo.png")
         
         return memomartFrame
