@@ -1,3 +1,4 @@
+# Written by Dean Badr - 2025
 # IMPORTS
 import settings
 import customCamera as CAM
