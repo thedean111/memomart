@@ -1,3 +1,4 @@
+# Written by Dean Badr - 2025
 # No need to touch this, but this value will be the default on boot
 DELAY_TIME = 0
 
