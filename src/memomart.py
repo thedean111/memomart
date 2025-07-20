@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# Written by Dean Badr - 2025
 # SERVICE COMMANDS
 # sudo systemctl restart memomart.service
 # sudo systemctl stop memomart.service
