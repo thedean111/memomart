@@ -1,3 +1,4 @@
+# Written by Dean Badr - 2025
 from escpos.printer import Usb
 from PIL import Image
 import settings
