@@ -78,7 +78,7 @@ FILENAME = "photo"
 
 # Name of the frame to paste the taken pictures in, these should exist in the
 # /frames directory
-FRAME = "bantam 4.png"
+FRAME = "aamna.png"
 
 # Should the photo be saved for later viewing, otherwise the same file will just
 # keep getting overwritten.
@@ -87,7 +87,7 @@ FRAME = "bantam 4.png"
 # ---- It refers to the value stored in "index.txt", so change that number to 0
 # ---- if you want the file names to start at 0
 DEEPSAVE_PHOTO = False
-DEEPSAVE_DIR = "beltline_07_02_2025"
+DEEPSAVE_DIR = "aamna_07_13_2025"
 
 # Should a video be recorded?
 RECORD_VIDEO = False

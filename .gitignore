@@ -7,4 +7,6 @@ videos/*
 audio/*
 !audio/.gitkeep
 
+/*.png
+
 .venv/
