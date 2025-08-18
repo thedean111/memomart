@@ -1,3 +1,4 @@
+# Written by Dean Badr - 2025
 # IMPORTS
 from gpiozero import PWMLED
 import time

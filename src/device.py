@@ -1,3 +1,4 @@
+# Written by Dean Badr - 2025
 import pyaudio
 
 p = pyaudio.PyAudio()

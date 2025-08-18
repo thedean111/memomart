@@ -1,3 +1,4 @@
+# Written by Dean Badr - 2025
 import cv2
 from picamera2 import Picamera2
 from PIL import Image

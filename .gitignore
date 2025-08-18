@@ -9,4 +9,9 @@ audio/*
 
 /*.png
 
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
 .venv/

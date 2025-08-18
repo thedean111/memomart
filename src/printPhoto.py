@@ -1,3 +1,4 @@
+# Written by Dean Badr - 2025
 import customPrinter as Printer
 import customCamera as Cam
 import logic
@@ -11,6 +12,4 @@ filepath = f"saved_photos/{DIRECTORY}/{PHOTO_NAME}"
 logic.Setup()
 img = Cam.ConfigureMemomartFormat(filepath)
 
-img1 = Image.open("extra/receipt_annotations.png")
-
-Printer.PrintPhoto(img1)
+Printer.PrintPhoto(img)
