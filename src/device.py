@@ -1,4 +1,13 @@
-# Written by Dean Badr - 2025
+'''
+File:
+device.py
+
+Purpose:
+Setup for the audio processing.
+
+Author:
+Dean Badr - 06/2025
+'''
 import pyaudio
 
 p = pyaudio.PyAudio()

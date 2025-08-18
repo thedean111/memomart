@@ -1,4 +1,14 @@
-# Written by Dean Badr - 2025
+'''
+File:
+customLED.py
+
+Purpose:
+Dedicated file for all LED-related operations that memomart should use. Provides
+helper functions to control the lighting of the LED.
+
+Author:
+Dean Badr - 06/2025
+'''
 # IMPORTS
 from gpiozero import PWMLED
 import time

@@ -1,4 +1,13 @@
-# Written by Dean Badr - 2025
+'''
+File:
+printFromDir.py
+
+Purpose:
+Prints all photos in a directory.
+
+Author:
+Dean Badr - 06/2025
+'''
 from escpos.printer import Usb
 from PIL import Image
 import time

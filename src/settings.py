@@ -1,4 +1,14 @@
-# Written by Dean Badr - 2025
+'''
+File:
+settings.py
+
+Purpose:
+Contains many parameters that are used throughout the machine's operations. The main
+interface for configuring the machine.
+
+Author:
+Dean Badr - 06/2025
+'''
 # No need to touch this, but this value will be the default on boot
 DELAY_TIME = 0
 

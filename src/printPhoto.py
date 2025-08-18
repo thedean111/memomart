@@ -1,4 +1,13 @@
-# Written by Dean Badr - 2025
+'''
+File:
+printPhoto.py
+
+Purpose:
+Prints a single photo.
+
+Author:
+Dean Badr - 06/2025
+'''
 import customPrinter as Printer
 import customCamera as Cam
 import logic

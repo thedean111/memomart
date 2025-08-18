@@ -1,4 +1,13 @@
-# Written by Dean Badr - 2025
+'''
+File:
+logic.py
+
+Purpose:
+The main logic for the machine's operations.
+
+Author:
+Dean Badr - 06/2025
+'''
 import cv2
 from picamera2 import Picamera2
 

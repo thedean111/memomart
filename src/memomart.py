@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 
-# Written by Dean Badr - 2025
+'''
+File:
+memomart.py
+
+Purpose:
+Entry point for service activation. Starts the logic operations loop.
+
+Author:
+Dean Badr - 06/2025
+'''
 # SERVICE COMMANDS
 # sudo systemctl restart memomart.service
 # sudo systemctl stop memomart.service

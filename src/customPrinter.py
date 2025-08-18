@@ -1,4 +1,14 @@
-# Written by Dean Badr - 2025
+'''
+File:
+customPrinter.py
+
+Purpose:
+Dedicated file for all printer-related operations that memomart should use. Includes modular
+helper functions for setup, printing, etc.
+
+Author:
+Dean Badr - 06/2025
+'''
 from escpos.printer import Usb
 from PIL import Image
 import settings

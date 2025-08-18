@@ -21,3 +21,6 @@ _View a live feed of logging from the service_
 <br>
 _Observe the throttled status of the raspberry pi_
 `vcgencmd get_throttled`
+
+## Notes
+Refer to `/src/settings.py` for the main configuration parameters of the machine. Most of these settings will give the user the flexibility to operate the machine as desired.

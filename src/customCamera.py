@@ -1,4 +1,15 @@
-# Written by Dean Badr - 2025
+'''
+File:
+customCamera.py
+
+Purpose:
+Dedicated file for all camera-related operations that memomart should use. Contains
+modular helper functions that can be called to control the camera behavior throughout
+the logic.
+
+Author:
+Dean Badr - 06/2025
+'''
 import cv2
 from picamera2 import Picamera2
 from PIL import Image

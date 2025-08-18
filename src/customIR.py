@@ -1,4 +1,14 @@
-# Written by Dean Badr - 2025
+'''
+File:
+customIR.py
+
+Purpose:
+Dedicated file for all IR receiver-related operations that memomart should use. Responds
+to inputs from the IR remote. May change settings, control the camera, printer, etc.
+
+Author:
+Dean Badr - 06/2025
+'''
 # IMPORTS
 import settings
 import customCamera as CAM
