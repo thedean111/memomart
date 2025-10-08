@@ -11,7 +11,7 @@ Author:
 Dean Badr - 06/2025
 '''
 import cv2
-from picamera2 import Picamera2
+#from picamera2 import Picamera2
 from PIL import Image
 import os
 import threading
@@ -215,7 +215,7 @@ def Capture():
             if not ret:
                 print("Failed to capture image.")
                 return
-            print(filepath)
+
             cv2.imwrite(filepath, frame)
             print("Photo saved.")
 

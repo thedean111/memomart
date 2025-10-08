@@ -9,17 +9,17 @@ Author:
 Dean Badr - 06/2025
 '''
 import cv2
-from picamera2 import Picamera2
+#from picamera2 import Picamera2
 
 from gpiozero import Button, PWMLED
-from evdev import InputDevice, ecodes
+# from evdev import InputDevice, ecodes
 import evdev
 from PIL import Image
 
 import time
 
 import settings
-import customIR as IR
+# import customIR as IR
 import customLED as LED
 import customCamera as CAM
 import customPrinter as printer
@@ -34,16 +34,16 @@ button = None
 def Setup():
     global ir, button, lastIR
 
-    devices = [InputDevice(path) for path in evdev.list_devices()]
-    ir_path = ""
-    for device in devices:
-        if "gpio_ir_recv" in device.name.lower():
-            ir_path = device.path
+    # devices = [InputDevice(path) for path in evdev.list_devices()]
+    #ir_path = ""
+    #for device in devices:
+    #    if "gpio_ir_recv" in device.name.lower():
+    #        ir_path = device.path
 
-    ir = InputDevice(ir_path)
+    #ir = InputDevice(ir_path)
     button = Button(17, pull_up=True, bounce_time=0.2)
     LED.Init()
-    lastIR = time.time()
+    # lastIR = time.time()
     CAM.SetupCamera()
     printer.SetupPrinter()
 
@@ -56,26 +56,26 @@ def ServiceLoop():
     # Initialize state data
     button_ready = True
     last_press = 0
-    lastIR = 0
+    # lastIR = 0
 
     # Show user that the device can now be used
     printer.PrintActivationMessage()
 
     # Loop, polling for different events
     while True:
-        # When reading an event from the infrared receiver
-        event = ir.read_one()
-        if ((time.time() - lastIR) >= settings.IR_REBOUNCE_DELAY) and event and event.type == ecodes.EV_MSC and event.code == ecodes.MSC_SCAN:
-            lastIR = time.time()
-            val = IR.handleIR(event.value)
-            if val is not None:
-                print(val)
-                printer.PrintSettingsChange()
-                LED.Blink(val)
+        # # When reading an event from the infrared receiver
+        # event = ir.read_one()
+        # if ((time.time() - lastIR) >= settings.IR_REBOUNCE_DELAY) and event and event.type == ecodes.EV_MSC and event.code == ecodes.MSC_SCAN:
+        #     lastIR = time.time()
+        #     val = IR.handleIR(event.value)
+        #     if val is not None:
+        #         print(val)
+        #         printer.PrintSettingsChange()
+        #         LED.Blink(val)
             
-            # Flush all events that may be pending
-            while ir.read_one():
-                pass  # Discard the event
+        #     # Flush all events that may be pending
+        #     while ir.read_one():
+        #         pass  # Discard the event
 
         # When the button is pressed
         if button.is_pressed and button_ready:

@@ -60,9 +60,9 @@ IR_REBOUNCE_DELAY = 0.2
 # -------------------------------------------------------------------
 # CAMERA MODES
 # -------------------------------------------------------------------
-MIN_EXPOSURE = 100
-MIN_BRIGHTNESS = 128
-MIN_GAIN = 150
+MIN_EXPOSURE = 150 #100
+MIN_BRIGHTNESS = 128 #128
+MIN_GAIN = 150 #150
 
 MAX_EXPOSURE = 1000
 MAX_BRIGHTNESS = 200
@@ -97,8 +97,8 @@ FRAME = "aamna.png"
 # -- will appear as "pic_beltline_06162025_1", "pic_beltline_06162025_2", etc
 # ---- It refers to the value stored in "index.txt", so change that number to 0
 # ---- if you want the file names to start at 0
-DEEPSAVE_PHOTO = False
-DEEPSAVE_DIR = "aamna_07_13_2025"
+DEEPSAVE_PHOTO = True
+DEEPSAVE_DIR = "atl_memomart2_test"
 
 # Should a video be recorded?
 RECORD_VIDEO = False

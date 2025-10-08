@@ -14,7 +14,7 @@ Dean Badr - 06/2025
 # sudo systemctl restart memomart.service
 # sudo systemctl stop memomart.service
 # sudo systemctl start memomart.service
-# journalctl -u memomart.service -f
+# journalctl -u memomart.service -f (this will show the log)
 # vcgencmd get_throttled
 
 # IMPORTS
