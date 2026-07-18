@@ -6,11 +6,11 @@ Dean Badr
 
 ## Connecting to the PI
 If the raspberry pi for the device was configured consistently with the other existing devices, a connection with it can be established at:
-_memomart@memomart.local_
-
+`memomart@memomart.local`
+<br><br>
 If you are on a device that has previously connected to a device with the same name, you may need to remove knowledge of the previous host with:
-_ssh _
-
+`ssh-keygen -R <hostname>`
+<br><br>
 ## Useful Commands
 The follow lines are useful terminal commands that help control and inspect the service:
 
