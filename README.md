@@ -4,6 +4,13 @@ Codebase for Mem-O-Mart, an Atlanta-based installation meant to deliver spontane
 ## Author(s)
 Dean Badr
 
+## Connecting to the PI
+If the raspberry pi for the device was configured consistently with the other existing devices, a connection with it can be established at:
+_memomart@memomart.local_
+
+If you are on a device that has previously connected to a device with the same name, you may need to remove knowledge of the previous host with:
+_ssh _
+
 ## Useful Commands
 The follow lines are useful terminal commands that help control and inspect the service:
 
