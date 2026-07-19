@@ -18,10 +18,10 @@ DIRECTORY = "beltline_06_19_2025"
 PHOTO_NAME = "photo_501.png"
 
 #filepath = f"saved_photos/{DIRECTORY}/{PHOTO_NAME}"
-filepath = f"PROMPT_MEMOMART_A.png"
+filepath = f"WHATIS.png"
 
 #logic.Setup()
-Cam.SetupCamera()
+#Cam.SetupCamera()
 Printer.SetupPrinter()
 
 time.sleep(1)
@@ -31,6 +31,6 @@ savepath = Cam.Capture()
 
 time.sleep(1)
 savepath = Cam.Capture()
-img = Cam.ConfigureMemomartFormat(savepath)
-
+img = Cam.ConfigureMemomartFormat(filepath)
+# img = Image.open(settings.BUSINESS_CARD_PATH)
 Printer.PrintPhoto(img)

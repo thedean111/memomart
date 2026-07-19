@@ -21,6 +21,7 @@ led = None
 def Init():
     global led
     led = PWMLED(18, initial_value=True)
+    led.value = 0.75
 
 # -------------------------------------------------------------------
 # Off: Turn off the led

@@ -18,7 +18,7 @@ DELAY_TIME = 0
 # Pixel offset of where the top left corner of the picture should be
 # in the memomart frame
 PICTURE_OFFSET_X = 45
-PICTURE_OFFSET_Y = 220
+PICTURE_OFFSET_Y = 156
 
 # How large to resize the taken photo to fit the frame
 PICTURE_SIZE_X = 486
@@ -60,9 +60,9 @@ IR_REBOUNCE_DELAY = 0.2
 # -------------------------------------------------------------------
 # CAMERA MODES
 # -------------------------------------------------------------------
-MIN_EXPOSURE = 150 #100
-MIN_BRIGHTNESS = 128 #128
-MIN_GAIN = 150 #150
+MIN_EXPOSURE = 400 #100
+MIN_BRIGHTNESS = 200 #128
+MIN_GAIN = 300 #150
 
 MAX_EXPOSURE = 1000
 MAX_BRIGHTNESS = 200
@@ -74,11 +74,20 @@ CAM_MODE_INCREMENTS = 20
 # INTERACTIVE SETTINGS
 # -------------------------------------------------------------------
 # How long after a button press can it be pressed again
-BUTTON_COOLDOWN = 2
+BUTTON_COOLDOWN = 3
 
 # This delay will be used in non-prompt mode on IR button "1"
 # time between button press and picture taken
-PHOTO_DELAY = 1.5
+PHOTO_DELAY = 1.0
+
+# Will holding the button execute the hold action
+ENABLE_HOLD = True
+
+# How long the button needs to be held for special behavior
+BUTTON_HOLD_THRESHOLD = 3
+
+# File path to the business card
+BUSINESS_CARD_PATH = "business_cards/BIZ CARD 2.png"
 
 # -------------------------------------------------------------------
 # SAVING SETTINGS
@@ -89,7 +98,7 @@ FILENAME = "photo"
 
 # Name of the frame to paste the taken pictures in, these should exist in the
 # /frames directory
-FRAME = "aamna.png"
+FRAME = "beltline_71826.png"
 
 # Should the photo be saved for later viewing, otherwise the same file will just
 # keep getting overwritten.
@@ -98,7 +107,7 @@ FRAME = "aamna.png"
 # ---- It refers to the value stored in "index.txt", so change that number to 0
 # ---- if you want the file names to start at 0
 DEEPSAVE_PHOTO = True
-DEEPSAVE_DIR = "atl_memomart2_test"
+DEEPSAVE_DIR = "beltline_07182026"
 
 # Should a video be recorded?
 RECORD_VIDEO = False

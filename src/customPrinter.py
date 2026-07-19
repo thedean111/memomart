@@ -76,6 +76,12 @@ def PrintPrompt():
     prompt = Image.open(path)
     PrintPhoto(prompt)
 
+def PrintBusinessCard():
+    abspath = os.path.abspath(".")
+    path = os.path.join(abspath, settings.BUSINESS_CARD_PATH)
+    bc = Image.open(path)
+    PrintPhoto(bc)
+    
 # -------------------------------------------------------------------
 # PrintSettingsChange: Print a little slip that describes the new
 # mode the machine is on
