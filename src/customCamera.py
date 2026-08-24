@@ -43,7 +43,8 @@ def SetupCamera():
             camera = cv2.VideoCapture(0, cv2.CAP_V4L2)
             if not camera.isOpened():
                 print("Could not open webcam.")
-                exit()
+                return False
+                # exit()
 
             camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
             camera.set(cv2.CAP_PROP_GAIN, settings.MIN_GAIN)
@@ -69,12 +70,14 @@ def SetupCamera():
 
     except Exception as e:
         print("Failed to open the camera:", e)
-        exit()
+        return False
+        # exit()
 
     gain_incr = (settings.MAX_GAIN - settings.MIN_GAIN) / settings.CAM_MODE_INCREMENTS
     brightness_incr = (settings.MAX_BRIGHTNESS - settings.MIN_BRIGHTNESS) / settings.CAM_MODE_INCREMENTS
     exposure_incr = (settings.MAX_EXPOSURE - settings.MIN_EXPOSURE) / settings.CAM_MODE_INCREMENTS
-
+    return True
+    
 # -------------------------------------------------------------------
 # SetCameraParams: Using openCV, set any camera params
 # -------------------------------------------------------------------

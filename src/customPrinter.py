@@ -22,7 +22,12 @@ def SetupPrinter():
     global printer
 
     try:
-        printer = Usb(settings.PRINTER_VID, settings.PRINTER_PID, 0)
+        printer = Usb(
+            settings.PRINTER_VID, 
+            settings.PRINTER_PID,
+            0,
+            out_ep=settings.PRINTER_OUT,
+            in_ep=settings.PRINTER_IN)
         printer.profile.media['width']['pixels'] = 576
         print("Successfully connect to thermal printer.")
 
@@ -75,6 +80,19 @@ def PrintPrompt():
 
     prompt = Image.open(path)
     PrintPhoto(prompt)
+
+# -------------------------------------------------------------------
+# Debug: Allows the user to define a custom package to print as
+# a debug statement
+# -------------------------------------------------------------------
+def Debug(*, text="Debug line.", beginning_line=1, end_line=1):
+    printer.set(align='left', font='a', custom_size=True, width=1, height=1)
+    printer.text("DEBUG")
+    printer.ln(beginning_line)
+    printer.set(align='center', font='b', custom_size=True, width=2, height=2)
+    printer.text(text)
+    printer.ln(end_line)
+    printer.cut()
 
 # -------------------------------------------------------------------
 # PrintSettingsChange: Print a little slip that describes the new

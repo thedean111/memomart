@@ -50,8 +50,13 @@ USE_WEBCAM = True
 USE_PICAM = False
 
 # The IDs of the printer so the code can find the usb connection
-PRINTER_VID = 0x04b8
-PRINTER_PID = 0x0e28
+# PRINTER_VID = 0x04b8
+# PRINTER_PID = 0x0e28
+
+PRINTER_VID = 0x0485
+PRINTER_PID = 0x5741
+PRINTER_OUT = 0x02
+PRINTER_IN = 0x82
 
 # The amount of time that needs to pass after a signal before the next
 # can be reacted to
