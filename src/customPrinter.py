@@ -63,6 +63,7 @@ def PrintPhoto(photo):
         print("Cannot access printer.")
         return
     
+    photo = photo.convert("L")
     printer.image(photo, center=True)
     printer.cut()
 

@@ -94,7 +94,7 @@ FILENAME = "photo"
 
 # Name of the frame to paste the taken pictures in, these should exist in the
 # /frames directory
-FRAME = "aamna.png"
+FRAME = "bantam 1.png"
 
 # Should the photo be saved for later viewing, otherwise the same file will just
 # keep getting overwritten.
