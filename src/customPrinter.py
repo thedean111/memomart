@@ -82,6 +82,12 @@ def PrintPrompt():
     prompt = Image.open(path)
     PrintPhoto(prompt)
 
+def PrintBusinessCard():
+    abspath = os.path.abspath(".")
+    path = os.path.join(abspath, settings.BUSINESS_CARD_PATH)
+    bc = Image.open(path)
+    PrintPhoto(bc)
+    
 # -------------------------------------------------------------------
 # Debug: Allows the user to define a custom package to print as
 # a debug statement
