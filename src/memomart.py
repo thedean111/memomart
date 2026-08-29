@@ -20,6 +20,7 @@ Dean Badr - 06/2025
 
 # IMPORTS
 from devices import FM_LED, FM_Printer, FM_Camera, FM_Button
+from api import FM_Server
 from PIL import Image
 
 import time
@@ -46,6 +47,18 @@ class MemomartApp:
         self.pictureButton.holdAction = self.HoldAction
         self.pictureButton.onReady = self.buttonLED.Blink(2, 0.3)
 
+    # -------------------------------------------------------------------
+    # GetSettings: Return a dictionary of whatever is in config.json
+    # -------------------------------------------------------------------
+    def GetSettings(self):
+        return {"test": 1, "test2": 2}
+
+    # -------------------------------------------------------------------
+    # UpdateSettings: Take whatever is in the data package and store it
+    # in config.json
+    # -------------------------------------------------------------------
+    def UpdateSettings(self, data):
+        pass
 
     # -------------------------------------------------------------------
     # GenerateFramedImage: Put the image at imgPath in a frame and save
@@ -138,3 +151,6 @@ class MemomartApp:
 if __name__ == "__main__":
     app = MemomartApp()
     app.Start()
+
+    server = FM_Server(app)
+    server.Run()
