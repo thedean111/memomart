@@ -92,7 +92,7 @@ ENABLE_HOLD = True
 BUTTON_HOLD_THRESHOLD = 3
 
 # File path to the business card
-BUSINESS_CARD_PATH = "business_cards/BIZ CARD 2.png"
+BUSINESS_CARD_PATH = "media/business_cards/BIZ CARD 2.png"
 
 # -------------------------------------------------------------------
 # SAVING SETTINGS
@@ -112,7 +112,7 @@ FRAME = "bantam 1.png"
 # ---- It refers to the value stored in "index.txt", so change that number to 0
 # ---- if you want the file names to start at 0
 DEEPSAVE_PHOTO = True
-DEEPSAVE_DIR = "beltline_07182026"
+DEEPSAVE_DIR = "test_save"
 
 # Should a video be recorded?
 RECORD_VIDEO = False
