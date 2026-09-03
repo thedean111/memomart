@@ -12,7 +12,7 @@ Dean Badr - 06/2025
 # IMPORTS
 from gpiozero import Button, PWMLED
 from escpos.printer import Usb
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 import cv2
 import threading
 import os
@@ -119,16 +119,24 @@ class FM_Button:
                     self.onReady()
 
 class FM_Printer:
+    pixelWidth = 576
+    
     # -------------------------------------------------------------------
     # __init__: Connect to the printer and configure the width of
     # images to print
     # -------------------------------------------------------------------
     def __init__(self, VID, PID, OUT_EP, IN_EP):
         try:
-            self.__printer = Usb(VID, PID, 0, OUT_EP, IN_EP)
-            self.__printer.profile.media['width']['pixels'] = 576
+            self.__printer = Usb(
+                VID, 
+                PID, 
+                0, 
+                out_ep=OUT_EP, 
+                in_ep=IN_EP)
+            self.__printer.profile.media['width']['pixels'] = self.pixelWidth
             print("Successfully connect to thermal printer.")
-
+            print("OUT_EP:", hex(self.__printer.out_ep))
+            print("IN_EP:", hex(self.__printer.in_ep))
         except Exception as e:
             print(f"Printer setup error: {e}")
             exit()
@@ -141,7 +149,7 @@ class FM_Printer:
         if self.__printer == None:
             print("Cannot access a printer.")
             return
-    
+        
         print("Printing activation message.")
         self.__printer.ln(5)
         self.__printer.set(align='center', font='b', custom_size=True, width=2, height=2)
@@ -151,18 +159,19 @@ class FM_Printer:
         self.__printer.text("Please press the button to receive a \ncopy of your memory! ")
         self.__printer.ln(5)
         self.__printer.cut()  
-    
+
     # -------------------------------------------------------------------
     # PrintPhoto: Prints the passed in photo
     # -------------------------------------------------------------------
-    def PrintPhoto(self, photo):
+    def PrintPhoto(self, photo, lines=0):
         if self.__printer == None:
             print("Cannot access printer.")
             return
 
-        photo = photo.convert("L")
+        # photo = photo.convert("L")
         self.__printer.image(photo, center=True)
-        self.__printer.cut()
+        self.__printer.ln(lines)
+        self.__printer.cut(mode='FULL', feed=True) 
 
     # -------------------------------------------------------------------
     # PrintBusinessCard: Prints the passed in photo
@@ -200,6 +209,7 @@ class FM_Camera:
                 return False
 
             self.__camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
+            print("Connected to camera!")
 
         except Exception as e:
             print("Failed to open the camera:", e)
@@ -217,6 +227,17 @@ class FM_Camera:
         if exposure is not None:
             self.__camera.set(cv2.CAP_PROP_EXPOSURE, exposure)
 
+    # -------------------------------------------------------------------
+    # GetFrame: Grab a frame from the camera
+    # -------------------------------------------------------------------
+    def GetFrame(self):
+        with self.camLock:
+            ret, frame = self.__camera.read()
+
+        if not ret:
+            return None
+
+        return frame
     # -------------------------------------------------------------------
     # Capture: Save the image in the camera's current frame
     # -------------------------------------------------------------------

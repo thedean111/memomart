@@ -28,6 +28,10 @@ PICTURE_SIZE_Y = 648
 # -- this depends on the camera orientation
 ROTATION = 90
 
+FONT_SIZE = 36
+EVENT_DESCRIPTION = "1x VALLEY ROAD"
+EVENT_LOCATION = "MONTCLAIR, NJ"
+EVENT_DATE = "9/2/2026"
 # -------------------------------------------------------------------
 # PROMPT CONFIGURATION
 # -------------------------------------------------------------------
@@ -65,13 +69,17 @@ IR_REBOUNCE_DELAY = 0.2
 # -------------------------------------------------------------------
 # CAMERA MODES
 # -------------------------------------------------------------------
-MIN_EXPOSURE = 400 #100
-MIN_BRIGHTNESS = 200 #128
-MIN_GAIN = 300 #150
+MIN_EXPOSURE = 20 #100
+MIN_BRIGHTNESS = 10 #128
+MIN_GAIN = 10 #150
 
 MAX_EXPOSURE = 1000
 MAX_BRIGHTNESS = 200
-MAX_GAIN = 1000
+MAX_GAIN = 300
+
+BRIGHTNESS = 100
+GAIN = 100
+EXPOSURE = 100
 
 CAM_MODE_INCREMENTS = 20
 
@@ -111,7 +119,7 @@ FRAME = "bantam 1.png"
 # -- will appear as "pic_beltline_06162025_1", "pic_beltline_06162025_2", etc
 # ---- It refers to the value stored in "index.txt", so change that number to 0
 # ---- if you want the file names to start at 0
-DEEPSAVE_PHOTO = True
+DEEPSAVE_PHOTO = False
 DEEPSAVE_DIR = "test_save"
 
 # Should a video be recorded?

@@ -20,11 +20,13 @@ Dean Badr - 06/2025
 
 # IMPORTS
 from devices import FM_LED, FM_Printer, FM_Camera, FM_Button
-from PIL import Image
+from api import FM_Server
+from PIL import Image, ImageFont, ImageDraw
 
 import time
 import os
 import settings
+import threading
 
 class MemomartApp:
     # -------------------------------------------------------------------
@@ -40,12 +42,52 @@ class MemomartApp:
                     settings.PRINTER_IN)
 
         self.mainCamera = FM_Camera()
-
+        self.mainCamera.SetParameters(
+            gain=settings.GAIN, 
+            brightness=settings.BRIGHTNESS, 
+            exposure=settings.EXPOSURE)
         self.pictureButton = FM_Button(17)
         self.pictureButton.quickAction = self.PrintCapturedPhoto
         self.pictureButton.holdAction = self.HoldAction
         self.pictureButton.onReady = self.buttonLED.Blink(2, 0.3)
 
+    # -------------------------------------------------------------------
+    # GetSettings: Return a dictionary of whatever is in config.json
+    # -------------------------------------------------------------------
+    def GetSettings(self):
+        return {
+            "min_brightness": settings.MIN_BRIGHTNESS, 
+            "max_brightness": settings.MAX_BRIGHTNESS,
+            "min_gain": settings.MIN_GAIN, 
+            "max_gain": settings.MAX_GAIN,
+            "min_exposure": settings.MIN_EXPOSURE, 
+            "max_exposure": settings.MAX_EXPOSURE,
+            "brightness": settings.BRIGHTNESS,
+            "gain": settings.GAIN,
+            "exposure": settings.EXPOSURE,
+        }
+
+    # -------------------------------------------------------------------
+    # UpdateSettings: Take whatever is in the data package and store it
+    # in config.json
+    # -------------------------------------------------------------------
+    def UpdateSettings(self, data):
+        b = None
+        e = None
+        g = None
+        if "brightness" in data:
+            b = data["brightness"]
+            settings.BRIGHTNESS = b
+
+        if "gain" in data:
+            g = data["gain"]
+            settings.GAIN = g
+
+        if "exposure" in data:
+            e = data["exposure"]
+            settings.EXPOSURE = e
+        
+        self.mainCamera.SetParameters(brightness=b, exposure=e, gain=g)
 
     # -------------------------------------------------------------------
     # GenerateFramedImage: Put the image at imgPath in a frame and save
@@ -72,11 +114,43 @@ class MemomartApp:
             return
 
     # -------------------------------------------------------------------
+    # PillowFrame: Use PIL to draw the frame at runtime
+    # -------------------------------------------------------------------
+    def PillowFrame(self, camImgPath):
+        topTxt = 20
+        spacing = 20
+        imgOffset = topTxt + spacing + settings.FONT_SIZE
+        evtOffset = imgOffset + settings.PICTURE_SIZE_Y + spacing
+        receiptLenPixels = evtOffset + settings.FONT_SIZE + settings.FONT_SIZE + 5 + 100
+        font = ImageFont.truetype("fonts/Lekton/Lekton-Regular.ttf", size=settings.FONT_SIZE)
+        im = Image.new("RGB", (self.printer.pixelWidth, receiptLenPixels), "white")
+
+        # Paste the camera image into the frame
+        camImg = Image.open(camImgPath).rotate(settings.ROTATION, expand=True).resize((settings.PICTURE_SIZE_X, settings.PICTURE_SIZE_Y))
+        x = (im.width - camImg.width) // 2
+        im.paste(camImg, (x, imgOffset))
+
+        # Header Text
+        d = ImageDraw.Draw(im)
+        d.text((self.printer.pixelWidth // 2, topTxt), "FREE MEMORIES", fill="black", anchor='ma', font=font)
+
+        # Event details
+        d.text((x, evtOffset), settings.EVENT_DESCRIPTION, fill="black", anchor='la', font=font)
+        d.text((x, evtOffset + settings.FONT_SIZE + 5), f"{settings.EVENT_LOCATION} - {settings.EVENT_DATE}", fill="black", anchor='la', font=font)
+
+        d.rectangle([(0, receiptLenPixels-2), (3, receiptLenPixels)], fill="black")
+        im.convert('L').save("media/memomart_photo.png")
+        return im
+    
+    # -------------------------------------------------------------------
     # PrintCapturedPhoto: Print the frame from the camera in the
     # appropriate outline
     # -------------------------------------------------------------------
     def PrintCapturedPhoto(self):
-        filepath = f"media/{settings.FILENAME}.png"
+        abspath = os.path.abspath(".")
+        # filepath = f"media/{settings.FILENAME}.png"
+        filepath = os.path.join(abspath, f"media/{settings.FILENAME}.png")
+
         if settings.DEEPSAVE_PHOTO:
             filename = ""
             with open ("media/saved_photos/index.txt", "r+") as f:
@@ -86,7 +160,7 @@ class MemomartApp:
                 f.write(str(count + 1))
                 f.truncate()
 
-            abspath = os.path.abspath(".")
+            
             dirpath = os.path.join(abspath, f"media/saved_photos/{settings.DEEPSAVE_DIR}")
             if not os.path.exists(dirpath):
                 os.mkdir(dirpath)
@@ -95,6 +169,7 @@ class MemomartApp:
         self.mainCamera.Capture(filepath)
         self.buttonLED.Off()
         # self.printer.PrintPhoto(self.GenerateFramedImage(filepath, "media/memomart_photo.png"))
+        self.printer.PrintPhoto(self.PillowFrame(filepath), lines=2)
 
     # -------------------------------------------------------------------
     # HoldAction: What to do when the main button is held. Branch can be
@@ -111,14 +186,20 @@ class MemomartApp:
         frame = Image.open(framePath)
         for photo in os.listdir(dirPath):
             time.sleep(0.5)
-            file_path = os.path.join(dir_path, photo)
+            file_path = os.path.join(dirPath, photo)
             if os.path.isfile(file_path):
                 img = Image.open(file_path).rotate(settings.ROTATION, expand=True).resize((settings.PICTURE_SIZE_X, settings.PICTURE_SIZE_Y))
-                memomartFrame.paste(img, (settings.PICTURE_OFFSET_X, settings.PICTURE_OFFSET_Y))
+                frame.paste(img, (settings.PICTURE_OFFSET_X, settings.PICTURE_OFFSET_Y))
                 try:
-                    self.printer.PrintPhoto(memomartFrame)
+                    self.printer.PrintPhoto(frame)
                 except Exception as e:
                     print(f"Printer error: {e}")
+
+    # -------------------------------------------------------------------
+    # GetCameraFrame: Pull frame from camera
+    # -------------------------------------------------------------------
+    def GetCameraFrame(self):
+        return self.mainCamera.GetFrame()
 
     # -------------------------------------------------------------------
     # Start: Initiates the operational loop
@@ -126,7 +207,7 @@ class MemomartApp:
     def Start(self):
         print("Starting Memomart!")
 
-        # self.printer.PrintStartMessage()
+        self.printer.PrintStartMessage()
 
         while True:
             self.pictureButton.UpdateState()
@@ -137,4 +218,13 @@ class MemomartApp:
 # -------------------------------------------------------------------
 if __name__ == "__main__":
     app = MemomartApp()
+    server = FM_Server(app)
+
+    server_thread = threading.Thread(
+        target=server.Run,
+        daemon=True
+    )
+
+    server_thread.start()
+
     app.Start()
