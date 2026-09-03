@@ -46,7 +46,6 @@ class FM_Server:
         def get_config():
             return jsonify(self.application.GetSettings())
 
-
         @self.app.put("/api/config")
         def update_config():
             data = request.get_json()
