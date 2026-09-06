@@ -1,12 +1,14 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, session
 import cv2
 import numpy as np
 from PIL import Image
+import os
 
 class FM_Server:
     preview_contrast = 1.0
     preview_noise = 1.0
-
+    # SECRET_KEY = "7beb30d1664eade822b39b4f5b1c4785f5845eef2819e56d10f68bacff3d7297"
+    # PASSWORD_HASH = "scrypt:32768:8:1$jXQLWVMwQgnz2CLY$ff04ee5bb0a156566ab6a155c67102480d4c5ad74cdf427c0aa90863d3ccb1f5f07d6d25e1f7bcf198030ee87464ea99d9471c18cfa1d75865d9619633be7d89"
     # -------------------------------------------------------------------
     # __init__: Setup server states
     # -------------------------------------------------------------------
@@ -17,16 +19,20 @@ class FM_Server:
             static_url_path=""
         )
         self.application = application
+        # self.SECRET_KEY = os.environ["FM_SECRET_KEY"]
+        # self.PASSWORD_HASH = os.environ["FM_PASSWORD_HASH"]
         self.SetupRoutes()
 
     # -------------------------------------------------------------------
     # SetupRoutes: Configure the routes in the server
     # -------------------------------------------------------------------
     def SetupRoutes(self):
+        # ---------------- PAGES --------------------------
         @self.app.route("/")
         def index():
             return self.app.send_static_file("index.html")
 
+        # ---------------- REQUESTS --------------------------
         @self.app.put("/api/preview-settings")
         def update_preview_settings():
 
@@ -62,6 +68,15 @@ class FM_Server:
                 self._generate_camera_frames(),
                 mimetype="multipart/x-mixed-replace; boundary=frame"
             )
+
+        # @self.app.post("/api/login")
+        # def login():
+        #     data = request.get_json()
+        #     if check_password_hash(PASSWORD_HASH, data["password"]):
+        #         session["authenticated"] = True
+        #         return jsonify({"success": True})
+
+        #     return jsonify({"success": False}), 401
 
     def ApplyCameraEffects(self, frame):
 

@@ -17,8 +17,6 @@ import cv2
 import threading
 import os
 import time
-# import pyaudio
-# import wave
 
 class FM_LED:
     # -------------------------------------------------------------------

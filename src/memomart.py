@@ -117,11 +117,13 @@ class MemomartApp:
     # PillowFrame: Use PIL to draw the frame at runtime
     # -------------------------------------------------------------------
     def PillowFrame(self, camImgPath):
-        topTxt = 20
+        topTxt = 50
         spacing = 20
         imgOffset = topTxt + spacing + settings.FONT_SIZE
-        evtOffset = imgOffset + settings.PICTURE_SIZE_Y + spacing
-        receiptLenPixels = evtOffset + settings.FONT_SIZE + settings.FONT_SIZE + 5 + 100
+        evtOffset = imgOffset + settings.PICTURE_SIZE_Y + spacing + spacing
+        lineHeight = settings.FONT_SIZE + settings.FONT_SIZE + 50
+        lineWidth = 2
+        receiptLenPixels = evtOffset + settings.FONT_SIZE + settings.FONT_SIZE + 5 + 120
         font = ImageFont.truetype("fonts/Lekton/Lekton-Regular.ttf", size=settings.FONT_SIZE)
         im = Image.new("RGB", (self.printer.pixelWidth, receiptLenPixels), "white")
 
@@ -135,10 +137,11 @@ class MemomartApp:
         d.text((self.printer.pixelWidth // 2, topTxt), "FREE MEMORIES", fill="black", anchor='ma', font=font)
 
         # Event details
-        d.text((x, evtOffset), settings.EVENT_DESCRIPTION, fill="black", anchor='la', font=font)
-        d.text((x, evtOffset + settings.FONT_SIZE + 5), f"{settings.EVENT_LOCATION} - {settings.EVENT_DATE}", fill="black", anchor='la', font=font)
+        d.rectangle([(x, evtOffset), (x + lineWidth, evtOffset + lineHeight)], fill="black")
+        mid = evtOffset + (lineHeight // 2)
+        d.text((x + lineWidth + 20, mid - 3), settings.EVENT_DESCRIPTION, fill="black", anchor='ld', font=font)
+        d.text((x + lineWidth + 20, mid + 3), f"{settings.EVENT_LOCATION} - {settings.EVENT_DATE}", fill="black", anchor='la', font=font)
 
-        d.rectangle([(0, receiptLenPixels-2), (3, receiptLenPixels)], fill="black")
         im.convert('L').save("media/memomart_photo.png")
         return im
     
@@ -169,7 +172,7 @@ class MemomartApp:
         self.mainCamera.Capture(filepath)
         self.buttonLED.Off()
         # self.printer.PrintPhoto(self.GenerateFramedImage(filepath, "media/memomart_photo.png"))
-        self.printer.PrintPhoto(self.PillowFrame(filepath), lines=2)
+        self.printer.PrintPhoto(self.PillowFrame(filepath))
 
     # -------------------------------------------------------------------
     # HoldAction: What to do when the main button is held. Branch can be

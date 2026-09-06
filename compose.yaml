@@ -1,0 +1,22 @@
+services:
+  memomart:
+    image: memomart:latest
+    
+    build:
+      context: .
+      
+    container_name: memomart
+
+    restart: unless-stopped
+
+    ports:  
+      - "8000:8000"
+
+    env_file:
+      - /etc/memomart/memomart.env
+
+    devices:
+      - /dev/video0:/dev/video0
+      - /dev/bus/usb:/dev/bus/usb
+      - /dev/gpiochip0:/dev/gpiochip0
+      - /dev/gpiochip1:/dev/gpiochip1
