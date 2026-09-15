@@ -20,3 +20,8 @@ services:
       - /dev/bus/usb:/dev/bus/usb
       - /dev/gpiochip0:/dev/gpiochip0
       - /dev/gpiochip1:/dev/gpiochip1
+      
+    volumes:
+      - ./src:/app/src
+      - ./web:/app/web
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket

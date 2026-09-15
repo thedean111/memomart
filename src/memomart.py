@@ -18,6 +18,8 @@ Dean Badr - 06/2025
 # journalctl -u memomart.service -f (this will show the log)
 # vcgencmd get_throttled
 
+# export FM_SECRET_KEY="$(openssl rand -hex 32)"
+# export FM_PASSWORD_HASH="$(python -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('Pura_Vida'))")"
 # IMPORTS
 from devices import FM_LED, FM_Printer, FM_Camera, FM_Button
 from api import FM_Server
@@ -50,6 +52,7 @@ class MemomartApp:
         self.pictureButton.quickAction = self.PrintCapturedPhoto
         self.pictureButton.holdAction = self.HoldAction
         self.pictureButton.onReady = self.buttonLED.Blink(2, 0.3)
+        self.UpdateFrame()
 
     # -------------------------------------------------------------------
     # GetSettings: Return a dictionary of whatever is in config.json
@@ -65,6 +68,9 @@ class MemomartApp:
             "brightness": settings.BRIGHTNESS,
             "gain": settings.GAIN,
             "exposure": settings.EXPOSURE,
+            "eventDescription": settings.EVENT_DESCRIPTION,
+            "eventLocation": settings.EVENT_LOCATION,
+            "eventDate": settings.EVENT_DATE
         }
 
     # -------------------------------------------------------------------
@@ -86,6 +92,15 @@ class MemomartApp:
         if "exposure" in data:
             e = data["exposure"]
             settings.EXPOSURE = e
+
+        if "eventDescription" in data:
+            settings.EVENT_DESCRIPTION = data["eventDescription"].upper()
+
+        if "eventLocation" in data:
+            settings.EVENT_LOCATION = data["eventLocation"].upper()
+
+        if "eventDate" in data:
+            settings.EVENT_DATE = data["eventDate"].upper()
         
         self.mainCamera.SetParameters(brightness=b, exposure=e, gain=g)
 
@@ -93,14 +108,14 @@ class MemomartApp:
     # GenerateFramedImage: Put the image at imgPath in a frame and save
     # it to savePath
     # -------------------------------------------------------------------
-    def GenerateFramedImage(self, imgPath, savePath):
+    def GenerateFramedImage(self, imgPath, framePath, savePath):
         try:
             # Open the image saved by the webcam and do necessary adjustments
             img = Image.open(imgPath).rotate(settings.ROTATION, expand=True).resize((settings.PICTURE_SIZE_X, settings.PICTURE_SIZE_Y))
 
             # Open the frame
             abspath = os.path.abspath(".")
-            dir_path = os.path.join(abspath, f"media/frames/{settings.FRAME}")
+            dir_path = os.path.join(abspath, framePath)
             memomartFrame = Image.open(dir_path)
 
             # Combine the two images
@@ -114,9 +129,11 @@ class MemomartApp:
             return
 
     # -------------------------------------------------------------------
-    # PillowFrame: Use PIL to draw the frame at runtime
+    # UpdateFrame: Update the frame that camera images should be 
+    # placed in
     # -------------------------------------------------------------------
-    def PillowFrame(self, camImgPath):
+    def UpdateFrame(self):
+        # Define spacing for the frame layout
         topTxt = 50
         spacing = 20
         imgOffset = topTxt + spacing + settings.FONT_SIZE
@@ -124,25 +141,28 @@ class MemomartApp:
         lineHeight = settings.FONT_SIZE + settings.FONT_SIZE + 50
         lineWidth = 2
         receiptLenPixels = evtOffset + settings.FONT_SIZE + settings.FONT_SIZE + 5 + 120
+        photoX = (self.printer.pixelWidth - settings.PICTURE_SIZE_X) // 2
+
+        # Create the new frame image
         font = ImageFont.truetype("fonts/Lekton/Lekton-Regular.ttf", size=settings.FONT_SIZE)
         im = Image.new("RGB", (self.printer.pixelWidth, receiptLenPixels), "white")
-
-        # Paste the camera image into the frame
-        camImg = Image.open(camImgPath).rotate(settings.ROTATION, expand=True).resize((settings.PICTURE_SIZE_X, settings.PICTURE_SIZE_Y))
-        x = (im.width - camImg.width) // 2
-        im.paste(camImg, (x, imgOffset))
 
         # Header Text
         d = ImageDraw.Draw(im)
         d.text((self.printer.pixelWidth // 2, topTxt), "FREE MEMORIES", fill="black", anchor='ma', font=font)
 
-        # Event details
-        d.rectangle([(x, evtOffset), (x + lineWidth, evtOffset + lineHeight)], fill="black")
-        mid = evtOffset + (lineHeight // 2)
-        d.text((x + lineWidth + 20, mid - 3), settings.EVENT_DESCRIPTION, fill="black", anchor='ld', font=font)
-        d.text((x + lineWidth + 20, mid + 3), f"{settings.EVENT_LOCATION} - {settings.EVENT_DATE}", fill="black", anchor='la', font=font)
+        # Draw a black square where the image is supposed to be
+        d.rectangle([(photoX, imgOffset), (photoX + settings.PICTURE_SIZE_X, imgOffset + settings.PICTURE_SIZE_Y)], fill="black")
 
-        im.convert('L').save("media/memomart_photo.png")
+        # Event details
+        d.rectangle([(photoX, evtOffset), (photoX + lineWidth, evtOffset + lineHeight)], fill="black")
+        mid = evtOffset + (lineHeight // 2)
+        d.text((photoX + lineWidth + 20, mid - 3), settings.EVENT_DESCRIPTION, fill="black", anchor='ld', font=font)
+        d.text((photoX + lineWidth + 20, mid + 3), f"{settings.EVENT_LOCATION} - {settings.EVENT_DATE}", fill="black", anchor='la', font=font)
+
+        settings.PICTURE_OFFSET_X = photoX
+        settings.PICTURE_OFFSET_Y = imgOffset
+        im.convert('L').save("media/frames/memomart_frame.png")
         return im
     
     # -------------------------------------------------------------------
@@ -172,7 +192,7 @@ class MemomartApp:
         self.mainCamera.Capture(filepath)
         self.buttonLED.Off()
         # self.printer.PrintPhoto(self.GenerateFramedImage(filepath, "media/memomart_photo.png"))
-        self.printer.PrintPhoto(self.PillowFrame(filepath))
+        self.printer.PrintPhoto(self.GenerateFramedImage(filepath, "media/frames/memomart_frame.png", "media/memomart_photo.png"))
 
     # -------------------------------------------------------------------
     # HoldAction: What to do when the main button is held. Branch can be

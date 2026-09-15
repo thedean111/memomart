@@ -1,14 +1,15 @@
-from flask import Flask, jsonify, request, Response, session
+from unittest import result
+
 import cv2
 import numpy as np
-from PIL import Image
 import os
+from networkManager import NetworkManager
+from io import BytesIO
+from flask import Flask, jsonify, request, Response, send_file, session
+from PIL import Image
+from werkzeug.security import check_password_hash
 
 class FM_Server:
-    preview_contrast = 1.0
-    preview_noise = 1.0
-    # SECRET_KEY = "7beb30d1664eade822b39b4f5b1c4785f5845eef2819e56d10f68bacff3d7297"
-    # PASSWORD_HASH = "scrypt:32768:8:1$jXQLWVMwQgnz2CLY$ff04ee5bb0a156566ab6a155c67102480d4c5ad74cdf427c0aa90863d3ccb1f5f07d6d25e1f7bcf198030ee87464ea99d9471c18cfa1d75865d9619633be7d89"
     # -------------------------------------------------------------------
     # __init__: Setup server states
     # -------------------------------------------------------------------
@@ -19,8 +20,8 @@ class FM_Server:
             static_url_path=""
         )
         self.application = application
-        # self.SECRET_KEY = os.environ["FM_SECRET_KEY"]
-        # self.PASSWORD_HASH = os.environ["FM_PASSWORD_HASH"]
+        self.app.config["SECRET_KEY"] = os.environ["FM_SECRET_KEY"]
+        self.nm = NetworkManager()
         self.SetupRoutes()
 
     # -------------------------------------------------------------------
@@ -33,25 +34,18 @@ class FM_Server:
             return self.app.send_static_file("index.html")
 
         # ---------------- REQUESTS --------------------------
-        @self.app.put("/api/preview-settings")
-        def update_preview_settings():
+        # ------ Get authentication status ------ #
+        @self.app.get("/api/auth")
+        def get_auth_status():
+            authenticated = session.get("authenticated", False)
+            return jsonify({"authenticated": authenticated})
 
-            data = request.get_json()
-
-            if "contrast" in data:
-                self.preview_contrast = float(data["contrast"])
-            if "noise" in data:
-                self.preview_contrast = float(data["noise"])
-
-            return jsonify({
-                "contrast": self.preview_contrast,
-                "noise": self.preview_noise
-            })
-
+        # ------ Retrieve the current configuration ------ #
         @self.app.get("/api/config")
         def get_config():
             return jsonify(self.application.GetSettings())
 
+        # ------ Update configuration parameters ------ #
         @self.app.put("/api/config")
         def update_config():
             data = request.get_json()
@@ -62,6 +56,7 @@ class FM_Server:
                 "success": True
             })
 
+        # ------ Stream from the camera ------ #
         @self.app.get("/api/camera")
         def camera():
             return Response(
@@ -69,15 +64,62 @@ class FM_Server:
                 mimetype="multipart/x-mixed-replace; boundary=frame"
             )
 
-        # @self.app.post("/api/login")
-        # def login():
-        #     data = request.get_json()
-        #     if check_password_hash(PASSWORD_HASH, data["password"]):
-        #         session["authenticated"] = True
-        #         return jsonify({"success": True})
+        # ------ Get a preview of the frame ------ #
+        @self.app.get("/api/preview")
+        def get_preview():
+            print("PREVIEW REQUEST", request.args)
+            buffer = BytesIO()
+            img = self.application.UpdateFrame()
+            img.save(buffer, format="PNG")
+            buffer.seek(0)
+            return send_file(buffer, mimetype="image/png")
 
-        #     return jsonify({"success": False}), 401
+        # ------ Login to services ------ #
+        @self.app.post("/api/login")
+        def login():
+            data = request.get_json()
+            username = data.get("username")
+            password = data.get("password")
 
+            password_hash = os.environ.get("FM_PASSWORD_HASH")
+
+            if username != "admin":
+                return jsonify({"error": "Invalid username or password"}), 401
+            
+            password_hash = os.environ.get("FM_PASSWORD_HASH")
+            if not password_hash or not check_password_hash(password_hash, password):
+                return jsonify({"error": "Invalid username or password"}), 401
+
+            session["authenticated"] = True
+            return jsonify({"success": True})
+
+        # ------ Get Wifi status ------ #
+        @self.app.get("/api/wifi")
+        def wifiStatus():
+            return jsonify(self.nm.status())
+
+        # ------ Connect to wifi ------ #
+        @self.app.post("/api/wifi/connect")
+        def connectWifi():
+            data = request.get_json(silent=True) or {}
+
+            result = self.nm.connect(
+                data.get("ssid"),
+                data.get("password")
+            )
+            return jsonify(result), 200 if result["success"] else 400
+        
+        # ------ Disconnect from wifi ------ #
+        @self.app.post("/api/wifi/disconnect")
+        def disconnectWifi():
+            result = self.nm.disconnect()
+            print(result)
+            return jsonify(result), 200 if result["success"] else 400
+
+            
+    # -------------------------------------------------------------------
+    # ApplyCameraEffects: Apply custom filter to the frame
+    # -------------------------------------------------------------------
     def ApplyCameraEffects(self, frame):
 
         # Rotate
@@ -138,6 +180,9 @@ class FM_Server:
     # Run: Start the server
     # -------------------------------------------------------------------
     def Run(self):
+        res = self.nm.start()
+        print(res)
+        
         self.app.run(
             host="0.0.0.0",
             port=8000

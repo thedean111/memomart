@@ -1,25 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="rgba(119,104,205,1)">
-        <link rel="stylesheet" href="style.css">
-        <script src="app.js" defer></script>
-        <title>MEM-O-MART</title>
-    </head>
-
-    <body>
-        <!-- Content-->
-        <div class="content-layout">
-            <img class="camera-feed" src="/api/camera">
-            <div class="settings-container">
-                <fm-slider id="brightness-slider" label="Brightness"></fm-slider>
-                <div class="settings-divider"></div>
-                <fm-slider id="gain-slider" label="Gain"></fm-slider>
-                <div class="settings-divider"></div>
-                <fm-slider id="exposure-slider" label="Exposure"></fm-slider>
-            </div>
+    <div class="content-layout">
+        <img class="camera-feed" src="/api/camera">
+        <div class="settings-container">
+            <fm-slider id="brightness-slider" label="Brightness"></fm-slider>
+            <div class="settings-divider"></div>
+            <fm-slider id="gain-slider" label="Gain"></fm-slider>
+            <div class="settings-divider"></div>
+            <fm-slider id="exposure-slider" label="Exposure"></fm-slider>
         </div>
-    </body>
+    </div>
 </html>

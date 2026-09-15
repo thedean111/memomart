@@ -54,26 +54,6 @@ else
 fi
 
 # ----------------------------------------
-# Create environment configuration file
-# '.env' in /etc/memomart
-# ----------------------------------------
-echo "Creating environment configuration file..."
-mkdir -p "$CONFIG_DIR"
-chmod 700 "$CONFIG_DIR"
-if [ -f "$CONFIG_FILE" ]; then
-    echo "Environment configuration file already exists: $CONFIG_FILE"
-else
-    echo "Creating new environment configuration file: $CONFIG_FILE"
-    SECRET_KEY="$(openssl rand -hex 32)"
-    cat > "$CONFIG_FILE" << EOF
-FM_SECRET_KEY=$SECRET_KEY
-EOF
-    chown root:docker "$CONFIG_FILE"
-    chmod 640 "$CONFIG_FILE"
-    echo "Configuration created."
-fi
-
-# ----------------------------------------
 # Install the application to the correct
 # directory
 # ----------------------------------------
@@ -92,11 +72,41 @@ echo "Building Docker image..."
 echo
 docker compose build
 
-cat > "$CONFIG_FILE" << EOF
+# ----------------------------------------
+# Create environment configuration file
+# '.env' in /etc/memomart
+# ----------------------------------------
+echo "Creating environment configuration file..."
+mkdir -p "$CONFIG_DIR"
+chmod 700 "$CONFIG_DIR"
+if [ -f "$CONFIG_FILE" ]; then
+    echo "Environment configuration file already exists: $CONFIG_FILE"
+else
+    echo "Creating new environment configuration file: $CONFIG_FILE"
+    SECRET_KEY="$(openssl rand -hex 32)"
+    read -rsp "Enter admin password: " ADMIN_PASSWORD
+    echo
+    read -rsp "Confirm admin password: " ADMIN_PASSWORD_CONFIRM
+    echo
+    if [ "$ADMIN_PASSWORD" != "$ADMIN_PASSWORD_CONFIRM" ]; then
+        echo "Error: Passwords do not match."
+        exit 1
+    fi
+    PASSWORD_HASH="$(docker run --rm -e ADMIN_PASSWORD="$ADMIN_PASSWORD" memomart:latest python -c "import os; from werkzeug.security import generate_password_hash; print(generate_password_hash(os.environ['ADMIN_PASSWORD']))")"
+    cat > "$CONFIG_FILE" << EOF
 FM_SECRET_KEY=$SECRET_KEY
+FM_PASSWORD_HASH='$PASSWORD_HASH'
 EOF
-chown root:docker "$CONFIG_FILE"
-chmod 640 "$CONFIG_FILE"
+
+    unset ADMIN_PASSWORD
+    unset ADMIN_PASSWORD_CONFIRM
+    unset PASSWORD_HASH
+
+    chown root:docker "$CONFIG_FILE"
+    chmod 640 "$CONFIG_FILE"
+
+    echo "Configuration created."
+fi
 
 # ----------------------------------------
 # Create the systemd service
@@ -104,8 +114,8 @@ chmod 640 "$CONFIG_FILE"
 cat > /etc/systemd/system/memomart.service << EOF
 [Unit]
 Description=Mem-O-Mart Photobooth
-Requires=docker.service
-After=docker.service
+Requires=docker.service NetworkManager.service
+After=docker.service NetworkManager.service
 
 [Service]
 Type=oneshot

@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="rgba(119,104,205,1)">
-        <link rel="stylesheet" href="style.css">
-        <script src="app.js" defer></script>
-        <title>MEM-O-MART</title>
-    </head>
+    <!-- Header bar that contains the settings -->
+    <div class="login-panel">
+        <div class="text-field-container">
+            <label for="in_username">Username</label>
+            <input class="text-field" type="text" id="in_username" required> </input>
+        </div>
 
-    <body>
-        <!-- Header bar that contains the settings -->
-        <h1 class="header">
-            <label> LOGIN PAGE </label>
-            <button class="menu-button">&#9776;</button>
-        </h1>
-    </body>
+        <div class="text-field-container">
+            <label for="in_password">Password</label>
+            <input class="text-field" type="text" id="in_password" required> </input>
+        </div>
+
+        <button class="login-submit-button" id="submit-login-button"> Submit </button>
+    </div>
 </html>
