@@ -18,7 +18,7 @@ DELAY_TIME = 0
 # Pixel offset of where the top left corner of the picture should be
 # in the memomart frame
 PICTURE_OFFSET_X = 45
-PICTURE_OFFSET_Y = 220
+PICTURE_OFFSET_Y = 156
 
 # How large to resize the taken photo to fit the frame
 PICTURE_SIZE_X = 486
@@ -28,6 +28,10 @@ PICTURE_SIZE_Y = 648
 # -- this depends on the camera orientation
 ROTATION = 90
 
+FONT_SIZE = 28
+EVENT_DESCRIPTION = "1x VALLEY ROAD"
+EVENT_LOCATION = "MONTCLAIR, NJ"
+EVENT_DATE = "9/2/2026"
 # -------------------------------------------------------------------
 # PROMPT CONFIGURATION
 # -------------------------------------------------------------------
@@ -65,13 +69,17 @@ IR_REBOUNCE_DELAY = 0.2
 # -------------------------------------------------------------------
 # CAMERA MODES
 # -------------------------------------------------------------------
-MIN_EXPOSURE = 100
-MIN_BRIGHTNESS = 128
-MIN_GAIN = 150
+MIN_EXPOSURE = 20 #100
+MIN_BRIGHTNESS = 10 #128
+MIN_GAIN = 10 #150
 
 MAX_EXPOSURE = 1000
 MAX_BRIGHTNESS = 200
-MAX_GAIN = 1000
+MAX_GAIN = 300
+
+BRIGHTNESS = 100
+GAIN = 100
+EXPOSURE = 100
 
 CAM_MODE_INCREMENTS = 20
 
@@ -79,11 +87,20 @@ CAM_MODE_INCREMENTS = 20
 # INTERACTIVE SETTINGS
 # -------------------------------------------------------------------
 # How long after a button press can it be pressed again
-BUTTON_COOLDOWN = 2
+BUTTON_COOLDOWN = 3
 
 # This delay will be used in non-prompt mode on IR button "1"
 # time between button press and picture taken
-PHOTO_DELAY = 1.5
+PHOTO_DELAY = 1.0
+
+# Will holding the button execute the hold action
+ENABLE_HOLD = True
+
+# How long the button needs to be held for special behavior
+BUTTON_HOLD_THRESHOLD = 3
+
+# File path to the business card
+BUSINESS_CARD_PATH = "media/business_cards/BIZ CARD 2.png"
 
 # -------------------------------------------------------------------
 # SAVING SETTINGS
@@ -94,7 +111,7 @@ FILENAME = "photo"
 
 # Name of the frame to paste the taken pictures in, these should exist in the
 # /frames directory
-FRAME = "aamna.png"
+FRAME = "bantam 1.png"
 
 # Should the photo be saved for later viewing, otherwise the same file will just
 # keep getting overwritten.
@@ -103,7 +120,7 @@ FRAME = "aamna.png"
 # ---- It refers to the value stored in "index.txt", so change that number to 0
 # ---- if you want the file names to start at 0
 DEEPSAVE_PHOTO = False
-DEEPSAVE_DIR = "aamna_07_13_2025"
+DEEPSAVE_DIR = "test_save"
 
 # Should a video be recorded?
 RECORD_VIDEO = False
