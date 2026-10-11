@@ -32,6 +32,13 @@ FONT_SIZE = 28
 EVENT_DESCRIPTION = "1x VALLEY ROAD"
 EVENT_LOCATION = "MONTCLAIR, NJ"
 EVENT_DATE = "9/2/2026"
+
+BRAND_IMAGE_OFFSET_X = 0
+BRAND_IMAGE_OFFSET_Y = 0
+BRAND_IMAGE_WIDTH = 100
+BRAND_IMAGE_HEIGHT = 100
+BRAND_IMAGE_OPACITY = 50
+
 # -------------------------------------------------------------------
 # PROMPT CONFIGURATION
 # -------------------------------------------------------------------

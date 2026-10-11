@@ -56,6 +56,15 @@ class FM_Server:
                 "success": True
             })
 
+        @self.app.put("/api/upload-brand-image")
+        def upload_brand_image():
+            file = request.files.get("brand-image")
+            if not file:
+                return jsonify({"error": "No file provided"}), 400
+
+            self.application.SetNewBrandImage(file.stream)
+            return jsonify({"success": True})
+
         # ------ Stream from the camera ------ #
         @self.app.get("/api/camera")
         def camera():
