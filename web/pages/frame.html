@@ -9,6 +9,23 @@
             <fm-text-input id="event-location" label="Event Location"></fm-text-input>
             <div class="settings-divider"></div>
             <fm-text-input id="event-date" label="Event Date"></fm-text-input>
+            <div class="settings-divider"></div>
+            <div class="image-upload"> 
+                <label class="slider-text" for="brand-image">Brand image</label> 
+                <input type="file" id="brand-image" accept=".png,.jpg,.jpeg,image/png,image/jpeg" > 
+                <button type="button" id="upload-image">Upload image</button> 
+                <p id="upload-status"></p> 
+            </div>
+            <div class="settings-divider"></div>
+            <fm-slider id="brand-image-offset-x" label="X Offset" min='-50' max='50'></fm-slider>
+            <div class="settings-divider"></div>
+            <fm-slider id="brand-image-offset-y" label="Y Offset" min='-50' max='50'></fm-slider>
+            <div class="settings-divider"></div>
+            <fm-slider id="brand-image-width" label="Width" min='20' max='200'></fm-slider>
+            <div class="settings-divider"></div>
+            <fm-slider id="brand-image-height" label="Height" min='20' max='200'></fm-slider>
+            <div class="settings-divider"></div>
+            <fm-slider id="brand-image-opacity" label="Opacity" min='0' max='255'></fm-slider>
         </div>
     </div>
 </html>

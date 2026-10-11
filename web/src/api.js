@@ -31,6 +31,20 @@ export async function updateConfig(changes) {
     return await response.json();
 }
 
+export async function updateBrandImage(formData) {
+    console.log("Updating brand image with file:", formData);
+    const response = await fetch("/api/upload-brand-image", {
+        method: "PUT",
+        body: formData
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update brand image");
+    }
+
+    return await response.json();
+}
+
 // -- Get authentication status -- //
 export async function getAuth() {
     const response = await fetch("/api/auth");

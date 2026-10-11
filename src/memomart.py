@@ -31,6 +31,7 @@ import settings
 import threading
 
 class MemomartApp:
+    
     # -------------------------------------------------------------------
     # __init__: Establish devices
     # -------------------------------------------------------------------
@@ -52,6 +53,8 @@ class MemomartApp:
         self.pictureButton.quickAction = self.PrintCapturedPhoto
         self.pictureButton.holdAction = self.HoldAction
         self.pictureButton.onReady = self.buttonLED.Blink(2, 0.3)
+        self.brandImage = Image.open("media/slime.png")
+        self.brandImageOriginal = Image.open("media/slime.png")
         self.UpdateFrame()
 
     # -------------------------------------------------------------------
@@ -70,7 +73,12 @@ class MemomartApp:
             "exposure": settings.EXPOSURE,
             "eventDescription": settings.EVENT_DESCRIPTION,
             "eventLocation": settings.EVENT_LOCATION,
-            "eventDate": settings.EVENT_DATE
+            "eventDate": settings.EVENT_DATE,
+            "brandImageOffsetX": settings.BRAND_IMAGE_OFFSET_X,
+            "brandImageOffsetY": settings.BRAND_IMAGE_OFFSET_Y,
+            "brandImageWidth": settings.BRAND_IMAGE_WIDTH,
+            "brandImageHeight": settings.BRAND_IMAGE_HEIGHT,
+            "brandImageOpacity": settings.BRAND_IMAGE_OPACITY
         }
 
     # -------------------------------------------------------------------
@@ -101,6 +109,21 @@ class MemomartApp:
 
         if "eventDate" in data:
             settings.EVENT_DATE = data["eventDate"].upper()
+
+        if "brandImageOffsetX" in data:
+            settings.BRAND_IMAGE_OFFSET_X = data["brandImageOffsetX"]
+
+        if "brandImageOffsetY" in data:
+            settings.BRAND_IMAGE_OFFSET_Y = data["brandImageOffsetY"]
+
+        if "brandImageWidth" in data:
+            settings.BRAND_IMAGE_WIDTH = data["brandImageWidth"]
+
+        if "brandImageHeight" in data:
+            settings.BRAND_IMAGE_HEIGHT = data["brandImageHeight"]
+
+        if "brandImageOpacity" in data:
+            settings.BRAND_IMAGE_OPACITY = data["brandImageOpacity"]
         
         self.mainCamera.SetParameters(brightness=b, exposure=e, gain=g)
 
@@ -127,6 +150,17 @@ class MemomartApp:
         except Exception as e:
             print("Photo error:", e)
             return
+
+    def SetNewBrandImage(self, imageData):
+        try:
+            self.brandImageOriginal = Image.open(imageData)
+            self.brandImage = self.brandImageOriginal.copy()
+        except Exception as e:
+            print("Brand image error:", e)
+            self.brandImageOriginal = None
+            self.brandImage = None
+
+        self.UpdateFrame()
 
     # -------------------------------------------------------------------
     # UpdateFrame: Update the frame that camera images should be 
@@ -160,6 +194,23 @@ class MemomartApp:
         d.text((photoX + lineWidth + 20, mid - 3), settings.EVENT_DESCRIPTION, fill="black", anchor='ld', font=font)
         d.text((photoX + lineWidth + 20, mid + 3), f"{settings.EVENT_LOCATION} - {settings.EVENT_DATE}", fill="black", anchor='la', font=font)
 
+        # Draw the brand image
+        self.brandImageOriginal = self.brandImageOriginal.convert("RGBA").resize(
+            (settings.BRAND_IMAGE_WIDTH, settings.BRAND_IMAGE_HEIGHT),
+            Image.Resampling.LANCZOS
+        )
+        self.brandImage = self.brandImageOriginal.copy()
+
+        opacity = settings.BRAND_IMAGE_OPACITY  # 0 = transparent, 255 = fully opaque
+        alpha = self.brandImageOriginal.getchannel("A")
+        new_alpha = alpha.point(lambda a: a * opacity // 255)
+        self.brandImage.putalpha(new_alpha)
+        im.paste(
+            self.brandImage, 
+            (self.printer.pixelWidth // 2 + settings.BRAND_IMAGE_OFFSET_X, evtOffset + settings.BRAND_IMAGE_OFFSET_Y),
+            self.brandImage.getchannel("A")
+        )
+
         settings.PICTURE_OFFSET_X = photoX
         settings.PICTURE_OFFSET_Y = imgOffset
         im.convert('L').save("media/frames/memomart_frame.png")
@@ -171,7 +222,6 @@ class MemomartApp:
     # -------------------------------------------------------------------
     def PrintCapturedPhoto(self):
         abspath = os.path.abspath(".")
-        # filepath = f"media/{settings.FILENAME}.png"
         filepath = os.path.join(abspath, f"media/{settings.FILENAME}.png")
 
         if settings.DEEPSAVE_PHOTO:
